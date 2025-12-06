@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-const part2 bool = true
+const part2 = true
 
 func check(e error) {
 	if e != nil {
@@ -37,7 +37,7 @@ func main() {
 				password += dial / 100
 			}
 		}
-		dial = (dial % 100 + 100) % 100
+		dial = (dial%100 + 100) % 100
 		if !part2 && dial == 0 {
 			password++
 		}
