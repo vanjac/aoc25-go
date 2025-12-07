@@ -3,17 +3,12 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/vanjac/aoc25-go/util"
 	"os"
 	"strconv"
 )
 
 const part2 = true
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
 
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
@@ -22,7 +17,7 @@ func main() {
 	for scanner.Scan() {
 		line := scanner.Text()
 		num, err := strconv.ParseInt(line[1:], 10, 32)
-		check(err)
+		util.Check(err)
 		if line[0] == 'L' {
 			dial -= int(num)
 			if part2 && dial <= 0 {
@@ -42,5 +37,5 @@ func main() {
 			password++
 		}
 	}
-	fmt.Println("Password:", password)
+	fmt.Println(password)
 }

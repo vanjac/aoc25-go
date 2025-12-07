@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/vanjac/aoc25-go/util"
 	"io"
 	"math"
 	"os"
@@ -10,12 +11,6 @@ import (
 )
 
 const part2 = true
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
 
 func numDigits(n int64) int {
 	return int(math.Floor(math.Log10(float64(n)))) + 1
@@ -61,16 +56,16 @@ func repeatPattern(pattern int64, repeats int) int64 {
 
 func main() {
 	data, err := io.ReadAll(os.Stdin)
-	check(err)
+	util.Check(err)
 	dataStr := strings.Trim(string(data), "\n")
 	sum := int64(0)
 	invalidIds := make(map[int64]bool)
 	for _, r := range strings.Split(dataStr, ",") {
 		parts := strings.SplitN(r, "-", 2)
 		minId, err := strconv.ParseInt(parts[0], 10, 64)
-		check(err)
+		util.Check(err)
 		maxId, err := strconv.ParseInt(parts[1], 10, 64)
-		check(err)
+		util.Check(err)
 		maxRepeats := 2
 		if part2 {
 			maxRepeats = numDigits(maxId)
