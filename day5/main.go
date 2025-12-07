@@ -2,13 +2,17 @@ package main
 
 import (
 	"bufio"
+	"cmp"
 	"fmt"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 
 	"github.com/vanjac/aoc25-go/util"
 )
+
+const part2 = true
 
 type Range struct {
 	min int64
@@ -39,13 +43,24 @@ func main() {
 		util.Check(err)
 		ranges = append(ranges, Range{min, max})
 	}
-	fresh := 0
-	for scanner.Scan() {
-		line := scanner.Text()
-		id, err := strconv.ParseInt(line, 10, 64)
-		util.Check(err)
-		if withinAnyRange(ranges, id) {
-			fresh++
+	fresh := int64(0)
+	if !part2 {
+		for scanner.Scan() {
+			line := scanner.Text()
+			id, err := strconv.ParseInt(line, 10, 64)
+			util.Check(err)
+			if withinAnyRange(ranges, id) {
+				fresh++
+			}
+		}
+	} else {
+		slices.SortFunc(ranges, func(a, b Range) int {
+			return cmp.Compare(a.min, b.min)
+		})
+		last := int64(0)
+		for _, r := range ranges {
+			fresh += max(r.max-max(r.min, last)+1, 0)
+			last = max(last, r.max+1)
 		}
 	}
 	fmt.Println(fresh)
