@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+const part2 = true
+
 func check(e error) {
 	if e != nil {
 		panic(e)
@@ -19,32 +21,42 @@ func numDigits(n int64) int {
 	return int(math.Floor(math.Log10(float64(n)))) + 1
 }
 
-func nextInvalidPattern(n int64) int64 {
+func nextInvalidPattern(n int64, repeats int) int64 {
 	digits := numDigits(n)
-	halfBase := int64(math.Pow10((digits + 1) / 2))
-	if digits%2 == 0 {
-		low := n % halfBase
-		high := n / halfBase
-		return min(max(low, high), high+1)
+	patDigits := (digits + repeats - 1) / repeats
+	if digits%repeats == 0 {
+		pattern := n / int64(math.Pow10(patDigits*(repeats-1)))
+		if repeatPattern(pattern, repeats) < n {
+			return pattern + 1
+		}
+		return pattern
 	} else {
-		return halfBase / 10
+		return int64(math.Pow10(patDigits - 1))
 	}
 }
 
-func prevInvalidPattern(n int64) int64 {
+func prevInvalidPattern(n int64, repeats int) int64 {
 	digits := numDigits(n)
-	halfBase := int64(math.Pow10(digits / 2))
-	if digits%2 == 0 {
-		low := n % halfBase
-		high := n / halfBase
-		return max(min(low, high), high-1)
+	patDigits := digits / repeats
+	if digits%repeats == 0 {
+		pattern := n / int64(math.Pow10(patDigits*(repeats-1)))
+		if repeatPattern(pattern, repeats) > n {
+			return pattern - 1
+		}
+		return pattern
 	} else {
-		return halfBase - 1
+		return int64(math.Pow10(patDigits)) - 1
 	}
 }
 
-func repeatPattern(pattern int64) int64 {
-	return pattern*int64(math.Pow10(numDigits(pattern))) + pattern
+func repeatPattern(pattern int64, repeats int) int64 {
+	sum := int64(0)
+	patBase := int64(math.Pow10(numDigits(pattern)))
+	for range repeats {
+		sum += pattern
+		pattern *= patBase
+	}
+	return sum
 }
 
 func main() {
@@ -52,17 +64,29 @@ func main() {
 	check(err)
 	dataStr := strings.Trim(string(data), "\n")
 	sum := int64(0)
+	invalidIds := make(map[int64]bool)
 	for _, r := range strings.Split(dataStr, ",") {
 		parts := strings.SplitN(r, "-", 2)
 		minId, err := strconv.ParseInt(parts[0], 10, 64)
 		check(err)
 		maxId, err := strconv.ParseInt(parts[1], 10, 64)
 		check(err)
-		minPattern := nextInvalidPattern(minId)
-		maxPattern := prevInvalidPattern(maxId)
-		for pat := minPattern; pat <= maxPattern; pat++ {
-			sum += repeatPattern(pat)
+		maxRepeats := 2
+		if part2 {
+			maxRepeats = numDigits(maxId)
 		}
+		for repeats := 2; repeats <= maxRepeats; repeats++ {
+			minPattern := nextInvalidPattern(minId, repeats)
+			maxPattern := prevInvalidPattern(maxId, repeats)
+			for pat := minPattern; pat <= maxPattern; pat++ {
+				invalid := repeatPattern(pat, repeats)
+				if !invalidIds[invalid] {
+					sum += invalid
+					invalidIds[invalid] = true
+				}
+			}
+		}
+
 	}
 	fmt.Println(sum)
 }
