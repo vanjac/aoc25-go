@@ -6,6 +6,8 @@ import (
 	"os"
 )
 
+const part2 = true
+
 func hasRoll(grid [][]bool, r, c int) bool {
 	if r < 0 || r >= len(grid) {
 		return false
@@ -28,29 +30,34 @@ func main() {
 		}
 		grid = append(grid, row)
 	}
-	rollCount := 0
-	for r := 0; r < len(grid); r++ {
-		for c := 0; c < len(grid[0]); c++ {
-			if !hasRoll(grid, r, c) {
-				fmt.Print(".")
-				continue
-			}
-			neighbors := -1
-			for dR := -1; dR <= 1; dR++ {
-				for dC := -1; dC <= 1; dC++ {
-					if hasRoll(grid, r+dR, c+dC) {
-						neighbors++
+	totalRolls := 0
+	for {
+		numRemoved := 0
+		for r := 0; r < len(grid); r++ {
+			for c := 0; c < len(grid[0]); c++ {
+				if !hasRoll(grid, r, c) {
+					continue
+				}
+				neighbors := -1
+				for dR := -1; dR <= 1; dR++ {
+					for dC := -1; dC <= 1; dC++ {
+						if hasRoll(grid, r+dR, c+dC) {
+							neighbors++
+						}
+					}
+				}
+				if neighbors < 4 {
+					numRemoved++
+					if part2 {
+						grid[r][c] = false
 					}
 				}
 			}
-			if neighbors < 4 {
-				rollCount++
-				fmt.Print("x")
-			} else {
-				fmt.Print("@")
-			}
 		}
-		fmt.Println()
+		totalRolls += numRemoved
+		if !part2 || numRemoved == 0 {
+			break
+		}
 	}
-	fmt.Println(rollCount)
+	fmt.Println(totalRolls)
 }
