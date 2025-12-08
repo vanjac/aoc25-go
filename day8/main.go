@@ -13,7 +13,8 @@ import (
 	"github.com/vanjac/aoc25-go/util"
 )
 
-const numConnections = 1000
+const part2 = true
+const maxConnections = 1000
 
 type Connection struct {
 	box1, box2 int // index
@@ -55,7 +56,11 @@ func main() {
 		circuitSizes[i] = 1
 	}
 
-	for c := 0; c < numConnections; c++ {
+	numConn := maxConnections
+	if part2 {
+		numConn = len(availConn)
+	}
+	for c := 0; c < numConn; c++ {
 		conn := availConn[c]
 		id1 := circuitIds[conn.box1]
 		id2 := circuitIds[conn.box2]
@@ -67,9 +72,16 @@ func main() {
 			}
 			circuitSizes[id1] += circuitSizes[id2]
 			circuitSizes[id2] = 0
+			if part2 && circuitSizes[id1] == len(coords) {
+				// last connection
+				fmt.Println(coords[conn.box1][0] * coords[conn.box2][0])
+				break
+			}
 		}
 	}
-	slices.Sort(circuitSizes)
-	l := len(circuitSizes)
-	fmt.Println(circuitSizes[l-1] * circuitSizes[l-2] * circuitSizes[l-3])
+	if !part2 {
+		slices.Sort(circuitSizes)
+		l := len(circuitSizes)
+		fmt.Println(circuitSizes[l-1] * circuitSizes[l-2] * circuitSizes[l-3])
+	}
 }
