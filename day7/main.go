@@ -6,28 +6,38 @@ import (
 	"os"
 )
 
+const part2 = true
+
 func main() {
-	beams := make([]bool, 0)
+	beams := make([]int, 0)
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
-	for _, ch := range scanner.Text() {
-		beams = append(beams, ch == 'S')
+	for i, ch := range scanner.Text() {
+		beams = append(beams, 0)
+		if ch == 'S' {
+			beams[i] = 1
+		}
 	}
 	numSplits := 0
+	if part2 {
+		numSplits = 1
+	}
 	for scanner.Scan() {
-		newBeams := make([]bool, len(beams))
+		newBeams := make([]int, len(beams))
 		for i, ch := range scanner.Text() {
 			if ch == '.' {
-				newBeams[i] = newBeams[i] || beams[i]
+				newBeams[i] += beams[i]
 			} else if ch == '^' {
-				if beams[i] {
+				if i > 0 {
+					newBeams[i-1] += beams[i]
+				}
+				if i+1 < len(beams) {
+					newBeams[i+1] += beams[i]
+				}
+				if !part2 && beams[i] != 0 {
 					numSplits++
-					if i > 0 {
-						newBeams[i-1] = true
-					}
-					if i+1 < len(beams) {
-						newBeams[i+1] = true
-					}
+				} else if part2 {
+					numSplits += beams[i]
 				}
 			}
 		}
